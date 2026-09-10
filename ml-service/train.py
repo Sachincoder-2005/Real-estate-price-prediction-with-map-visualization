@@ -149,11 +149,13 @@ random_forest_model = Pipeline(
         ("preprocessor", preprocessor),
         (
             "model",
-            RandomForestRegressor(
-                n_estimators=100,
-                random_state=42,
-                n_jobs=-1
-            )
+           RandomForestRegressor(
+    n_estimators=30,
+    max_depth=20,
+    min_samples_leaf=2,
+    random_state=42,
+    n_jobs=-1
+)
         )
     ]
 )
