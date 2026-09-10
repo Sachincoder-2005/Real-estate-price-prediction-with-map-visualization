@@ -183,7 +183,7 @@ useEffect(() => {
   const fetchHeatmapData = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/heatmap-data"
+        "https://real-estate-price-predictor-api.onrender.com/heatmap-data"
       );
 
       const data = await response.json();
@@ -715,7 +715,7 @@ if (Number(formData.total_floors) <= 0) {
 console.log("LONGITUDE:", formData.longitude);
 console.log("LAT TYPE:", typeof formData.latitude);
 console.log("LON TYPE:", typeof formData.longitude);
-    const response = await fetch("http://127.0.0.1:5000/predict", {
+    const response = await fetch("https://real-estate-price-predictor-api.onrender.com/predict", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -750,7 +750,7 @@ console.log("AREA:", formData.area);
   });
   try {
   const nearbyResponse = await fetch(
-    "http://127.0.0.1:5000/nearby-properties",
+   "https://real-estate-price-predictor-api.onrender.com/nearby-properties",
     {
       method: "POST",
       headers: {
