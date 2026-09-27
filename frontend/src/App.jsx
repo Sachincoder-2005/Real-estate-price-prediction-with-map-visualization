@@ -713,7 +713,7 @@ const searchPropertiesWithAssistant = async () => {
 
   try {
     const response = await fetch(
-    "http://127.0.0.1:5000/assistant",
+     "https://real-estate-price-predictor-api.onrender.com/assistant",
       {
         method: "POST",
         headers: {
