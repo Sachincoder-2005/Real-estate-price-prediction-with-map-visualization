@@ -1,37 +1,74 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
 import joblib
 import pandas as pd
 import numpy as np
 import os
-app = Flask(__name__)
+import re
 
+
+# ============================================================
+# FLASK APP
+# ============================================================
+
+app = Flask(__name__)
 CORS(app)
+
+
+# ============================================================
+# PATHS
+# ============================================================
+
 MODEL_PATH = "./models/random_forest_model.pkl"
 
-DATASET_PATH = "./dataset/mumbai-house-price-geospatial.csv"
+DATASET_PATH = "./dataset/mumbai-house-price-data-cleaned.csv"
+
 LOCALITY_MODEL_PATH = "./models/locality_avg_price.pkl"
 
-# Load dataset
+
+# ============================================================
+# LOAD PROPERTY DATASET
+# ============================================================
+
 if os.path.exists(DATASET_PATH):
     property_dataset = pd.read_csv(DATASET_PATH)
 else:
     property_dataset = pd.DataFrame()
 
-# Load trained model
-model = joblib.load(MODEL_PATH)
 
-# Load locality average price data
+# ============================================================
+# LOAD TRAINED MODEL
+# ============================================================
+
+if os.path.exists(MODEL_PATH):
+    model = joblib.load(MODEL_PATH)
+else:
+    model = None
+
+
+# ============================================================
+# LOAD LOCALITY AVERAGE PRICE DATA
+# ============================================================
+
 if os.path.exists(LOCALITY_MODEL_PATH):
     locality_avg_price = joblib.load(LOCALITY_MODEL_PATH)
 else:
     locality_avg_price = {}
-    # City centre coordinates
+
+
+# ============================================================
+# CITY CENTRE COORDINATES
+# ============================================================
+
 CITY_LAT = 18.9750
 CITY_LON = 72.8258
 
 
-# Calculate distance between two locations
+# ============================================================
+# HAVERSINE DISTANCE FUNCTION
+# ============================================================
+
 def haversine(lat1, lon1, lat2, lon2):
 
     R = 6371
@@ -50,7 +87,12 @@ def haversine(lat1, lon1, lat2, lon2):
     )
 
     return 2 * R * np.arcsin(np.sqrt(a))
-# Reference transit locations
+
+
+# ============================================================
+# REFERENCE TRANSIT LOCATIONS
+# ============================================================
+
 stations = [
     ("Andheri", 19.1197, 72.8468),
     ("Bandra", 19.0544, 72.8406),
@@ -69,6 +111,10 @@ station_lat = np.array([x[1] for x in stations])
 station_lon = np.array([x[2] for x in stations])
 
 
+# ============================================================
+# NEAREST TRANSIT DISTANCE
+# ============================================================
+
 def get_nearest_transit_distance(latitude, longitude):
 
     distances = haversine(
@@ -81,45 +127,58 @@ def get_nearest_transit_distance(latitude, longitude):
     return float(np.min(distances))
 
 
-# Create Flask application
-app = Flask(__name__)
-# Load property dataset for nearby comparable properties
-dataset_path = "./dataset/mumbai-house-price-data-cleaned.csv"
-
-if os.path.exists(dataset_path):
-    property_dataset = pd.read_csv(dataset_path)
-else:
-    property_dataset = pd.DataFrame()
-
-# Allow React frontend to communicate with Flask
-CORS(app)
-
-# Load trained model
-model = joblib.load("./models/random_forest_model.pkl")
-
+# ============================================================
+# HOME ROUTE
+# ============================================================
 
 @app.route("/")
 def home():
+
     return jsonify({
+        "success": True,
         "message": "Real Estate Price Prediction API is running!"
     })
+
+
+# ============================================================
+# PREDICT ROUTE
+# ============================================================
 
 @app.route("/predict", methods=["POST"])
 def predict():
 
     try:
 
-        # Get data from frontend
+        # ----------------------------------------------------
+        # Check model
+        # ----------------------------------------------------
+
+        if model is None:
+
+            return jsonify({
+                "success": False,
+                "error": "Trained model not found"
+            }), 500
+
+
+        # ----------------------------------------------------
+        # Get JSON data
+        # ----------------------------------------------------
+
         data = request.get_json()
 
-        # Check if data is received
         if not data:
+
             return jsonify({
                 "success": False,
                 "error": "No data received"
             }), 400
 
+
+        # ----------------------------------------------------
         # Required fields
+        # ----------------------------------------------------
+
         required_fields = [
             "area",
             "locality",
@@ -135,28 +194,46 @@ def predict():
             "longitude"
         ]
 
+
+        # ----------------------------------------------------
         # Check missing fields
+        # ----------------------------------------------------
+
         missing_fields = [
-            field for field in required_fields
+            field
+            for field in required_fields
             if field not in data
         ]
 
+
         if missing_fields:
+
             return jsonify({
                 "success": False,
                 "error": f"Missing fields: {', '.join(missing_fields)}"
             }), 400
 
-        # Convert numeric values safely
+
+        # ----------------------------------------------------
+        # Convert numeric values
+        # ----------------------------------------------------
+
         try:
 
             area = float(data["area"])
+
             bedroom_num = int(data["bedroom_num"])
+
             bathroom_num = int(data["bathroom_num"])
+
             balcony_num = int(data["balcony_num"])
+
             age = int(data["age"])
+
             total_floors = int(data["total_floors"])
+
             latitude = float(data["latitude"])
+
             longitude = float(data["longitude"])
 
         except (ValueError, TypeError):
@@ -166,75 +243,112 @@ def predict():
                 "error": "Invalid numeric value provided"
             }), 400
 
-        # Validate numeric values
+
+        # ----------------------------------------------------
+        # Validate values
+        # ----------------------------------------------------
 
         if area <= 0:
+
             return jsonify({
                 "success": False,
                 "error": "Area must be greater than 0"
             }), 400
 
+
         if bedroom_num < 0:
+
             return jsonify({
                 "success": False,
                 "error": "Bedrooms cannot be negative"
             }), 400
 
+
         if bathroom_num <= 0:
+
             return jsonify({
                 "success": False,
                 "error": "Bathrooms must be greater than 0"
             }), 400
 
+
         if balcony_num < 0:
+
             return jsonify({
                 "success": False,
                 "error": "Balconies cannot be negative"
             }), 400
 
+
         if age < 0:
+
             return jsonify({
                 "success": False,
                 "error": "Property age cannot be negative"
             }), 400
 
+
         if total_floors <= 0:
+
             return jsonify({
                 "success": False,
                 "error": "Total floors must be greater than 0"
             }), 400
 
-        # Validate geographic coordinates
+
+        # ----------------------------------------------------
+        # Validate coordinates
+        # ----------------------------------------------------
 
         if not (-90 <= latitude <= 90):
+
             return jsonify({
                 "success": False,
                 "error": "Invalid latitude"
             }), 400
 
+
         if not (-180 <= longitude <= 180):
+
             return jsonify({
                 "success": False,
                 "error": "Invalid longitude"
             }), 400
 
-        # Get locality average price per sqft
-        locality = data["locality"]
+
+        # ----------------------------------------------------
+        # Locality average price
+        # ----------------------------------------------------
+
+        locality = str(data["locality"]).strip()
+
 
         if locality in locality_avg_price:
+
             locality_avg_price_per_sqft = float(
                 locality_avg_price[locality]
             )
+
         else:
-            # Fallback to overall average
-            if "price_per_sqft" in property_dataset.columns:
+
+            if (
+                not property_dataset.empty
+                and "price_per_sqft" in property_dataset.columns
+            ):
+
                 locality_avg_price_per_sqft = float(
                     property_dataset["price_per_sqft"].mean()
                 )
+
             else:
+
                 locality_avg_price_per_sqft = 0.0
 
-        # Calculate distance to city centre
+
+        # ----------------------------------------------------
+        # Distance to city centre
+        # ----------------------------------------------------
+
         distance_to_city_center = float(
             haversine(
                 latitude,
@@ -244,13 +358,21 @@ def predict():
             )
         )
 
-        # Calculate distance to nearest transit
+
+        # ----------------------------------------------------
+        # Distance to nearest transit
+        # ----------------------------------------------------
+
         distance_to_nearest_transit = get_nearest_transit_distance(
             latitude,
             longitude
         )
 
+
+        # ----------------------------------------------------
         # Create input DataFrame
+        # ----------------------------------------------------
+
         property_data = pd.DataFrame([{
 
             "area": area,
@@ -288,253 +410,311 @@ def predict():
 
         }])
 
-        # ==========================================
+
+        # ====================================================
         # MAIN PREDICTION
-        # ==========================================
+        # ====================================================
 
         predicted_price = float(
             model.predict(property_data)[0]
         )
 
-        # ==========================================
+
+        # ====================================================
         # PRICE RANGE
-        # ==========================================
+        # ====================================================
 
         price_lower = None
         price_upper = None
 
-        # Check if loaded model is a Random Forest pipeline
-        if hasattr(model, "named_steps") and "model" in model.named_steps:
+
+        if (
+            hasattr(model, "named_steps")
+            and "model" in model.named_steps
+        ):
 
             rf_model = model.named_steps["model"]
 
+
             if hasattr(rf_model, "estimators_"):
 
-                # Transform input using pipeline preprocessor
-                preprocessor = model.named_steps["preprocessor"]
+                if "preprocessor" in model.named_steps:
 
-                transformed_data = preprocessor.transform(
-                    property_data
-                )
+                    preprocessor = model.named_steps["preprocessor"]
 
-                # Get prediction from every tree
-                tree_predictions = np.array([
 
-                    tree.predict(transformed_data)[0]
+                    transformed_data = preprocessor.transform(
+                        property_data
+                    )
 
-                    for tree in rf_model.estimators_
 
-                ])
+                    tree_predictions = np.array([
 
-                # Use 10th and 90th percentile
-                price_lower = float(
-                    np.percentile(tree_predictions, 10)
-                )
+                        tree.predict(transformed_data)[0]
 
-                price_upper = float(
-                    np.percentile(tree_predictions, 90)
-                )
+                        for tree in rf_model.estimators_
 
+                    ])
+
+
+                    price_lower = float(
+                        np.percentile(tree_predictions, 10)
+                    )
+
+
+                    price_upper = float(
+                        np.percentile(tree_predictions, 90)
+                    )
+
+
+        # ----------------------------------------------------
         # Fallback price range
+        # ----------------------------------------------------
+
         if price_lower is None or price_upper is None:
 
             price_lower = predicted_price * 0.90
 
             price_upper = predicted_price * 1.10
 
-        # ==========================================
+
+        # ====================================================
         # FEATURE IMPORTANCE
-        # ==========================================
+        # ====================================================
 
         feature_importance = []
 
+
         try:
 
-            rf_model = model.named_steps["model"]
+            if (
+                hasattr(model, "named_steps")
+                and "model" in model.named_steps
+                and "preprocessor" in model.named_steps
+            ):
 
-            preprocessor = model.named_steps["preprocessor"]
+                rf_model = model.named_steps["model"]
 
-            if hasattr(rf_model, "feature_importances_"):
+                preprocessor = model.named_steps["preprocessor"]
 
-                importances = rf_model.feature_importances_
 
-                transformed_features = (
-                    preprocessor.get_feature_names_out()
-                )
+                if hasattr(rf_model, "feature_importances_"):
 
-                importance_df = pd.DataFrame({
+                    importances = rf_model.feature_importances_
 
-                    "feature": transformed_features,
 
-                    "importance": importances
+                    transformed_features = (
+                        preprocessor.get_feature_names_out()
+                    )
 
-                })
 
-                # Map encoded features to original features
-                original_features = {
+                    importance_df = pd.DataFrame({
 
-                    "area": 0.0,
+                        "feature": transformed_features,
 
-                    "bedroom_num": 0.0,
+                        "importance": importances
 
-                    "bathroom_num": 0.0,
+                    })
 
-                    "balcony_num": 0.0,
 
-                    "age": 0.0,
+                    # ------------------------------------------------
+                    # Original feature dictionary
+                    # ------------------------------------------------
 
-                    "total_floors": 0.0,
+                    original_features = {
 
-                    "latitude": 0.0,
+                        "area": 0.0,
 
-                    "longitude": 0.0,
+                        "bedroom_num": 0.0,
 
-                    "locality_avg_price_per_sqft": 0.0,
+                        "bathroom_num": 0.0,
 
-                    "distance_to_city_center": 0.0,
+                        "balcony_num": 0.0,
 
-                    "distance_to_nearest_transit": 0.0,
+                        "age": 0.0,
 
-                    "locality": 0.0,
+                        "total_floors": 0.0,
 
-                    "city": 0.0,
+                        "latitude": 0.0,
 
-                    "property_type": 0.0,
+                        "longitude": 0.0,
 
-                    "furnished": 0.0
+                        "locality_avg_price_per_sqft": 0.0,
 
-                }
+                        "distance_to_city_center": 0.0,
 
-                for _, row in importance_df.iterrows():
+                        "distance_to_nearest_transit": 0.0,
 
-                    feature_name = row["feature"]
+                        "locality": 0.0,
 
-                    importance_value = row["importance"]
+                        "city": 0.0,
 
-                    # Remove transformer prefix
-                    clean_name = feature_name.split("__")[-1]
+                        "property_type": 0.0,
 
-                    # Numerical features
-                    for original_feature in [
+                        "furnished": 0.0
 
-                        "area",
-
-                        "bedroom_num",
-
-                        "bathroom_num",
-
-                        "balcony_num",
-
-                        "age",
-
-                        "total_floors",
-
-                        "latitude",
-
-                        "longitude",
-
-                        "locality_avg_price_per_sqft",
-
-                        "distance_to_city_center",
-
-                        "distance_to_nearest_transit"
-
-                    ]:
-
-                        if clean_name == original_feature:
-
-                            original_features[
-                                original_feature
-                            ] += importance_value
-
-                    # Categorical features
-                    for original_feature in [
-
-                        "locality",
-
-                        "city",
-
-                        "property_type",
-
-                        "furnished"
-
-                    ]:
-
-                        if clean_name.startswith(
-                            original_feature + "_"
-                        ):
-
-                            original_features[
-                                original_feature
-                            ] += importance_value
-
-                # Sort by importance
-                sorted_features = sorted(
-
-                    original_features.items(),
-
-                    key=lambda x: x[1],
-
-                    reverse=True
-
-                )
-
-                # Top 3 features
-                feature_importance = [
-
-                    {
-                        "feature": feature,
-
-                        "importance": round(
-                            float(importance), 4
-                        )
                     }
 
-                    for feature, importance
-                    in sorted_features[:3]
 
-                ]
+                    # ------------------------------------------------
+                    # Map feature importance
+                    # ------------------------------------------------
+
+                    for _, row in importance_df.iterrows():
+
+                        feature_name = row["feature"]
+
+                        importance_value = row["importance"]
+
+
+                        clean_name = feature_name.split("__")[-1]
+
+
+                        numerical_features = [
+
+                            "area",
+
+                            "bedroom_num",
+
+                            "bathroom_num",
+
+                            "balcony_num",
+
+                            "age",
+
+                            "total_floors",
+
+                            "latitude",
+
+                            "longitude",
+
+                            "locality_avg_price_per_sqft",
+
+                            "distance_to_city_center",
+
+                            "distance_to_nearest_transit"
+
+                        ]
+
+
+                        for original_feature in numerical_features:
+
+                            if clean_name == original_feature:
+
+                                original_features[
+                                    original_feature
+                                ] += importance_value
+
+
+                        categorical_features = [
+
+                            "locality",
+
+                            "city",
+
+                            "property_type",
+
+                            "furnished"
+
+                        ]
+
+
+                        for original_feature in categorical_features:
+
+                            if clean_name.startswith(
+                                original_feature + "_"
+                            ):
+
+                                original_features[
+                                    original_feature
+                                ] += importance_value
+
+
+                    # ------------------------------------------------
+                    # Sort
+                    # ------------------------------------------------
+
+                    sorted_features = sorted(
+
+                        original_features.items(),
+
+                        key=lambda x: x[1],
+
+                        reverse=True
+
+                    )
+
+
+                    # ------------------------------------------------
+                    # Top 3
+                    # ------------------------------------------------
+
+                    feature_importance = [
+
+                        {
+
+                            "feature": feature,
+
+                            "importance": round(
+                                float(importance),
+                                4
+                            )
+
+                        }
+
+                        for feature, importance
+                        in sorted_features[:3]
+
+                    ]
+
 
         except Exception:
 
             feature_importance = []
 
-        # ==========================================
-        # SEND RESPONSE
-        # ==========================================
+
+        # ====================================================
+        # RESPONSE
+        # ====================================================
 
         return jsonify({
 
             "success": True,
 
             "predicted_price": round(
-                predicted_price, 2
+                predicted_price,
+                2
             ),
 
             "price_range": {
 
                 "lower": round(
-                    price_lower, 2
+                    price_lower,
+                    2
                 ),
 
                 "upper": round(
-                    price_upper, 2
+                    price_upper,
+                    2
                 )
 
             },
 
-            # Location Analysis
             "distance_to_city_center": round(
-                distance_to_city_center, 2
+                distance_to_city_center,
+                2
             ),
 
             "distance_to_nearest_transit": round(
-                distance_to_nearest_transit, 2
+                distance_to_nearest_transit,
+                2
             ),
 
-            "feature_importance": feature_importance
+            "feature_importance":
+                feature_importance
 
         })
+
 
     except Exception as e:
 
@@ -544,94 +724,590 @@ def predict():
 
             "error": str(e)
 
-        }), 400
+        }), 500
+
+
+# ============================================================
+# NEARBY PROPERTIES
+# ============================================================
 
 @app.route("/nearby-properties", methods=["POST"])
 def nearby_properties():
+
     try:
+
         data = request.get_json()
 
-        latitude = float(data["latitude"])
-        longitude = float(data["longitude"])
 
-        if property_dataset.empty:
+        if not data:
+
             return jsonify({
                 "success": False,
+                "error": "No data received"
+            }), 400
+
+
+        latitude = float(data["latitude"])
+
+        longitude = float(data["longitude"])
+
+
+        if property_dataset.empty:
+
+            return jsonify({
+
+                "success": False,
+
                 "error": "Property dataset not found"
+
             }), 500
+
+
+        # ----------------------------------------------------
+        # Copy dataset
+        # ----------------------------------------------------
 
         nearby = property_dataset.copy()
 
+
+        # ----------------------------------------------------
         # Calculate approximate distance
+        # ----------------------------------------------------
+
         nearby["distance"] = (
-            (nearby["latitude"] - latitude) ** 2 +
+
+            (nearby["latitude"] - latitude) ** 2
+
+            +
+
             (nearby["longitude"] - longitude) ** 2
+
         ) ** 0.5
 
-        # Get nearest 20 properties
-        nearby = nearby.sort_values("distance").head(20)
+
+        # ----------------------------------------------------
+        # Nearest 20
+        # ----------------------------------------------------
+
+        nearby = (
+            nearby
+            .sort_values("distance")
+            .head(20)
+        )
+
 
         properties = []
 
+
         for _, row in nearby.iterrows():
+
             properties.append({
-                "latitude": float(row["latitude"]),
-                "longitude": float(row["longitude"]),
-                "price": float(row["price"]),
-                "area": float(row["area"]),
-                "locality": str(row["locality"]),
-                "property_type": str(row["property_type"]),
-                "bedrooms": int(row["bedroom_num"])
+
+                "latitude": float(
+                    row["latitude"]
+                ),
+
+                "longitude": float(
+                    row["longitude"]
+                ),
+
+                "price": float(
+                    row["price"]
+                ),
+
+                "area": float(
+                    row["area"]
+                ),
+
+                "locality": str(
+                    row["locality"]
+                ),
+
+                "property_type": str(
+                    row["property_type"]
+                ),
+
+                "bedrooms": int(
+                    row["bedroom_num"]
+                )
+
             })
 
+
         return jsonify({
+
             "success": True,
+
             "properties": properties
+
         })
 
+
     except Exception as e:
+
         return jsonify({
+
             "success": False,
+
             "error": str(e)
+
         }), 400
+
+
+# ============================================================
+# HEATMAP DATA
+# ============================================================
 
 @app.route("/heatmap-data", methods=["GET"])
 def heatmap_data():
-    try:
-        df = pd.read_csv(
-            "./dataset/mumbai-house-price-data-cleaned.csv"
-        )
 
-        # Only valid location and price data
+    try:
+
+        if property_dataset.empty:
+
+            return jsonify({
+
+                "success": False,
+
+                "error": "Property dataset not found"
+
+            }), 500
+
+
+        df = property_dataset.copy()
+
+
+        # ----------------------------------------------------
+        # Valid location and price
+        # ----------------------------------------------------
+
         df = df[
+
             df["latitude"].notna()
+
             & df["longitude"].notna()
+
             & df["price"].notna()
+
         ]
 
-        # Use 3000 random properties
-        # so browser does not receive all 71,938 rows
-        sample_size = min(3000, len(df))
 
-        df = df.sample(
-            sample_size,
-            random_state=42
+        # ----------------------------------------------------
+        # Maximum 3000 properties
+        # ----------------------------------------------------
+
+        sample_size = min(
+            3000,
+            len(df)
         )
 
+
+        if sample_size > 0:
+
+            df = df.sample(
+
+                sample_size,
+
+                random_state=42
+
+            )
+
+
         data = df[
-            ["latitude", "longitude", "price"]
-        ].to_dict(orient="records")
+
+            [
+                "latitude",
+                "longitude",
+                "price"
+            ]
+
+        ].to_dict(
+            orient="records"
+        )
+
 
         return jsonify({
+
             "success": True,
+
             "data": data
+
         })
 
+
     except Exception as e:
+
         return jsonify({
+
             "success": False,
+
             "error": str(e)
+
         }), 500
 
+
+# ============================================================
+# PROPERTY ASSISTANT
+# ============================================================
+
+@app.route("/assistant", methods=["POST"])
+def property_assistant():
+
+    try:
+
+        # ----------------------------------------------------
+        # Get request data
+        # ----------------------------------------------------
+
+        data = request.get_json()
+
+
+        if not data:
+
+            return jsonify({
+
+                "success": False,
+
+                "error": "No data received"
+
+            }), 400
+
+
+        query = data.get(
+            "query",
+            ""
+        ).strip()
+
+
+        if not query:
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                    "Please enter your property requirement"
+
+            }), 400
+
+
+        text = query.lower()
+
+
+        # ====================================================
+        # 1. EXTRACT BHK
+        # ====================================================
+
+        bhk_match = re.search(
+            r'(\d+)\s*bhk\b',
+            text
+        )
+
+
+        if bhk_match:
+
+            bedrooms = int(
+                bhk_match.group(1)
+            )
+
+        else:
+
+            bedrooms = None
+
+
+        # ====================================================
+        # 2. EXTRACT BUDGET
+        # ====================================================
+
+        budget = None
+
+
+        # Example:
+        # 1 crore
+        # ₹1 crore
+        # 1.5 crore
+        # 2 cr
+
+        crore_match = re.search(
+
+            r'₹?\s*(\d+(?:\.\d+)?)\s*(?:crore|cr)\b',
+
+            text
+
+        )
+
+
+        # Example:
+        # 50 lakh
+        # ₹50 lakh
+        # 75 lac
+        # 90 l
+
+        lakh_match = re.search(
+
+            r'₹?\s*(\d+(?:\.\d+)?)\s*(?:lakh|lac|l)\b',
+
+            text
+
+        )
+
+
+        if crore_match:
+
+            budget = (
+                float(crore_match.group(1))
+                * 10_000_000
+            )
+
+
+        elif lakh_match:
+
+            budget = (
+                float(lakh_match.group(1))
+                * 100_000
+            )
+
+
+        # ====================================================
+        # 3. DETECT LOCALITY
+        # ====================================================
+
+        localities = [
+
+            "andheri",
+
+            "bandra",
+
+            "borivali",
+
+            "dadar",
+
+            "kurla",
+
+            "ghatkopar",
+
+            "thane",
+
+            "powai",
+
+            "churchgate",
+
+            "cst",
+
+            "malad",
+
+            "goregaon",
+
+            "jogeshwari",
+
+            "kandivali",
+
+            "vile parle",
+
+            "chembur"
+
+        ]
+
+
+        selected_locality = None
+
+
+        for locality in localities:
+
+            if locality in text:
+
+                selected_locality = locality
+
+                break
+
+
+        # ====================================================
+        # 4. FILTER DATASET
+        # ====================================================
+
+        results = property_dataset.copy()
+
+
+        # ----------------------------------------------------
+        # Filter by bedrooms
+        # ----------------------------------------------------
+
+        if bedrooms is not None:
+
+            if "bedroom_num" in results.columns:
+
+                results = results[
+                    results["bedroom_num"]
+                    == bedrooms
+                ]
+
+
+        # ----------------------------------------------------
+        # Filter by budget
+        # ----------------------------------------------------
+
+        if budget is not None:
+
+            if "price" in results.columns:
+
+                results = results[
+                    results["price"]
+                    <= budget
+                ]
+
+
+        # ----------------------------------------------------
+        # Filter by locality
+        # ----------------------------------------------------
+
+        if selected_locality:
+
+            if "locality" in results.columns:
+
+                locality_mask = (
+
+                    results["locality"]
+
+                    .astype(str)
+
+                    .str.lower()
+
+                    .str.contains(
+
+                        selected_locality,
+
+                        na=False
+
+                    )
+
+                )
+
+
+                # Only apply locality filter
+                # if matching properties exist
+
+                if locality_mask.any():
+
+                    results = results[
+                        locality_mask
+                    ]
+
+
+        # ====================================================
+        # 5. SORT BY PRICE
+        # ====================================================
+
+        if "price" in results.columns:
+
+            results = (
+
+                results
+
+                .sort_values("price")
+
+                .head(10)
+
+            )
+
+
+        # ====================================================
+        # 6. CREATE PROPERTY RESPONSE
+        # ====================================================
+
+        properties = []
+
+
+        for _, row in results.iterrows():
+
+            properties.append({
+
+                "title": str(
+                    row.get(
+                        "title",
+                        "Property"
+                    )
+                ),
+
+                "price": float(
+                    row["price"]
+                ),
+
+                "area": float(
+                    row["area"]
+                ),
+
+                "locality": str(
+                    row["locality"]
+                ),
+
+                "property_type": str(
+                    row["property_type"]
+                ),
+
+                "bedrooms": int(
+                    row["bedroom_num"]
+                ),
+
+                "bathrooms": int(
+                    row["bathroom_num"]
+                ),
+
+                "latitude": float(
+                    row["latitude"]
+                ),
+
+                "longitude": float(
+                    row["longitude"]
+                )
+
+            })
+
+
+        # ====================================================
+        # 7. SEND RESPONSE
+        # ====================================================
+
+        return jsonify({
+
+            "success": True,
+
+            "query": query,
+
+            "filters": {
+
+                "budget": budget,
+
+                "bedrooms": bedrooms,
+
+                "locality": selected_locality
+
+            },
+
+            "count": len(properties),
+
+            "properties": properties
+
+        })
+
+
+    except Exception as e:
+
+        return jsonify({
+
+            "success": False,
+
+            "error": str(e)
+
+        }), 500
+
+
+# ============================================================
+# RUN FLASK SERVER
+# ============================================================
+
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+
+    app.run(
+        debug=True,
+        port=5000
+    )

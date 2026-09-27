@@ -23,8 +23,10 @@ const { data, error } = await supabase.auth.signInWithPassword({
 
 console.log("LOGIN RESULT:", { data, error });
 
-   if (error) {
-  setMessage("Invalid login password");
+  if (error) {
+  console.error("SUPABASE LOGIN ERROR:", error);
+
+  setMessage(error.message);
 } else {
   setMessage("Login successful!");
 

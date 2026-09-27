@@ -125,6 +125,13 @@ function HeatmapLayer({ properties, showHeatmap }) {
   return null;
 }
 function App() {
+   const [darkMode, setDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.body.classList.toggle("dark");
+  };
+
  const [authMode, setAuthMode] = useState("login");
   const [formData, setFormData] = useState({
     area: "",
@@ -169,6 +176,12 @@ const [featureImportance, setFeatureImportance] = useState([]);
 const [nearbyProperties, setNearbyProperties] = useState([]);
 const [heatmapProperties, setHeatmapProperties] = useState([]);
 const [showHeatmap, setShowHeatmap] = useState(false);
+const [assistantQuery, setAssistantQuery] = useState("");
+const [assistantOpen, setAssistantOpen] = useState(false);
+const [assistantResults, setAssistantResults] = useState([]);
+const [assistantFilters, setAssistantFilters] = useState(null);
+const [assistantLoading, setAssistantLoading] = useState(false);
+const [assistantError, setAssistantError] = useState("");
 
 const [locationAnalysis, setLocationAnalysis] = useState({
   distance_to_city_center: null,
@@ -687,6 +700,54 @@ const searchLocation = async () => {
   doc.save("Real-Estate-Price-Predictor-Valuation-Report.pdf");
 };
 
+const searchPropertiesWithAssistant = async () => {
+  if (!assistantQuery.trim()) {
+    setAssistantError("Pehle property requirement likho.");
+    return;
+  }
+
+  setAssistantLoading(true);
+  setAssistantError("");
+  setAssistantResults([]);
+  setAssistantFilters(null);
+
+  try {
+    const response = await fetch(
+    "http://127.0.0.1:5000/assistant",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: assistantQuery,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("ASSISTANT RESPONSE:", data);
+
+    if (data.success) {
+      setAssistantResults(data.properties || []);
+      setAssistantFilters(data.filters || {});
+    } else {
+      setAssistantError(
+        data.error || "Properties search nahi ho paayi."
+      );
+    }
+  } catch (error) {
+    console.error("Assistant error:", error);
+
+    setAssistantError(
+      "Assistant backend se connection nahi ho pa raha."
+    );
+  }
+
+  setAssistantLoading(false);
+};
+
   const predictPrice = async () => {
     if (!formData.area || Number(formData.area) <= 0) {
   setError("Please enter a valid area greater than 0.");
@@ -837,6 +898,10 @@ if (authMode === "login") {
 
   return (
     <div className="container">
+<button className="dark-mode-btn" onClick={toggleDarkMode}>
+  {darkMode ? "☀️" : "🌙"}
+</button>
+
      <header className="hero-header">
   <div className="hero-icon">🏠</div>
 
@@ -983,6 +1048,167 @@ if (authMode === "login") {
 ))}
   </MapContainer>
 </div>
+
+{!assistantOpen && (
+  <button
+    type="button"
+    className="ai-assistant-icon"
+    onClick={() => setAssistantOpen(true)}
+    title="AI Property Assistant"
+  >
+    🤖
+  </button>
+)}
+
+{assistantOpen && (
+  <div className="assistant-section">
+
+    <div className="assistant-header">
+
+      <div className="assistant-icon">
+        🤖
+      </div>
+
+      <div>
+        <h2>AI Property Assistant</h2>
+        <p>
+          Describe your property requirements in natural language
+        </p>
+      </div>
+
+      <button
+        type="button"
+        className="assistant-close"
+        onClick={() => setAssistantOpen(false)}
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div className="assistant-search">
+
+      <textarea
+        value={assistantQuery}
+        onChange={(e) => setAssistantQuery(e.target.value)}
+        placeholder="Example: I need a 2 BHK under ₹1 crore near Andheri"
+        rows="3"
+      />
+
+      <button
+        type="button"
+        onClick={searchPropertiesWithAssistant}
+        disabled={assistantLoading}
+      >
+        {assistantLoading
+          ? "🔎 Searching..."
+          : "🔍 Find Properties"}
+      </button>
+
+    </div>
+
+    {assistantError && (
+      <div className="assistant-error">
+        {assistantError}
+      </div>
+    )}
+
+    {assistantFilters && (
+      <div className="assistant-filters">
+
+        <strong>🔎 Search understood:</strong>
+
+        {assistantFilters.bedrooms && (
+          <span>
+            🛏 {assistantFilters.bedrooms} BHK
+          </span>
+        )}
+
+        {assistantFilters.budget && (
+          <span>
+            💰 ₹{" "}
+            {(assistantFilters.budget / 10000000).toFixed(2)}
+            Cr
+          </span>
+        )}
+
+        {assistantFilters.locality && (
+          <span>
+            📍 {assistantFilters.locality}
+          </span>
+        )}
+
+      </div>
+    )}
+
+    {assistantResults.length > 0 && (
+      <div className="assistant-results">
+
+        <h3>
+          🏠 {assistantResults.length} Properties Found
+        </h3>
+
+        <div className="assistant-property-grid">
+
+          {assistantResults.map((property, index) => (
+
+            <div
+              className="assistant-property-card"
+              key={`${property.latitude}-${property.longitude}-${index}`}
+            >
+
+              <div className="assistant-property-top">
+
+                <h3>
+                  🏠 {property.bedrooms} BHK
+                </h3>
+
+                <strong>
+                  ₹{" "}
+                  {Number(property.price).toLocaleString("en-IN")}
+                </strong>
+
+              </div>
+
+              <p>📍 {property.locality}</p>
+
+              <p>📐 {property.area} sqft</p>
+
+              <p>🚿 {property.bathrooms} Bathrooms</p>
+
+              <p>🏢 {property.property_type}</p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    latitude: Number(property.latitude),
+                    longitude: Number(property.longitude),
+                    locality: property.locality,
+                    bedroom_num: Number(property.bedrooms),
+                    bathroom_num: Number(property.bathrooms),
+                    area: Number(property.area),
+                    property_type: property.property_type,
+                  }));
+
+                  setAssistantOpen(false);
+                }}
+              >
+                📍 Show on Map
+              </button>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+    )}
+
+  </div>
+)}
 
       <div className="form">
 
