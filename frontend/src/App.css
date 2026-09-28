@@ -2075,3 +2075,46 @@ body.dark .logout-btn {
 .dark-btn:hover {
   transform: scale(1.08);
 }
+.hero-header {
+  position: relative;
+}
+
+.header-user-section {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .header-user-section {
+    top: 12px;
+    right: 12px;
+    gap: 6px;
+  }
+
+  .user-name {
+    font-size: 12px;
+  }
+
+  .logout-btn {
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+}

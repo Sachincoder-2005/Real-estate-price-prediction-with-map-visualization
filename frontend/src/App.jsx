@@ -126,6 +126,7 @@ function HeatmapLayer({ properties, showHeatmap }) {
 }
 function App() {
    const [darkMode, setDarkMode] = useState(false);
+   const [user, setUser] = useState(null);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -133,6 +134,7 @@ function App() {
   };
 
  const [authMode, setAuthMode] = useState("login");
+ const [userName, setUserName] = useState("");
   const [formData, setFormData] = useState({
     area: "",
     locality: "Andheri",
@@ -147,12 +149,20 @@ function App() {
     latitude: 19.1197,
     longitude: 72.8468,
   });
-  useEffect(() => {
+useEffect(() => {
   const checkSession = async () => {
     const { data } = await supabase.auth.getSession();
 
     if (data.session) {
       setAuthMode("app");
+
+      const fullName =
+        data.session.user.user_metadata?.full_name ||
+        data.session.user.user_metadata?.name ||
+        data.session.user.email?.split("@")[0] ||
+        "User";
+
+      setUserName(fullName);
     }
   };
 
@@ -166,6 +176,8 @@ const handleLogout = async () => {
     return;
   }
 
+  setUser(null);
+  setUserName("");
   setAuthMode("login");
 };
   const [price, setPrice] = useState(null);
@@ -884,15 +896,23 @@ if (authMode === "signup") {
 
 if (authMode === "login") {
   return (
-    <Login
-      onLogin={() => {
-        setAuthMode("app");
-      }}
-      onSignup={() => {
-        console.log("CHANGING TO SIGNUP");
-        setAuthMode("signup");
-      }}
-    />
+<Login
+  onLogin={(loggedInUser) => {
+    const fullName =
+      loggedInUser.user_metadata?.full_name ||
+      loggedInUser.user_metadata?.name ||
+      loggedInUser.email?.split("@")[0] ||
+      "User";
+
+    setUserName(fullName);
+    setUser(loggedInUser);
+    setAuthMode("app");
+  }}
+  onSignup={() => {
+    console.log("CHANGING TO SIGNUP");
+    setAuthMode("signup");
+  }}
+/>
   );
 }
 
@@ -914,6 +934,10 @@ if (authMode === "login") {
 
     <div className="header-line"></div>
   </div>
+<div className="user-actions">
+  <span className="user-name">
+    👤 {userName}
+  </span>
 
   <button
     type="button"
@@ -922,6 +946,7 @@ if (authMode === "login") {
   >
     Logout
   </button>
+</div>
 </header>
   
 
