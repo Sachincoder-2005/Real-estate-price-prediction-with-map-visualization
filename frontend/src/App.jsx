@@ -5,6 +5,18 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.heat";
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiTarget,
+  FiMap,
+  FiBarChart2,
+  FiClock,
+  FiCpu,
+  FiFileText,
+  FiSettings,
+} from "react-icons/fi";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -135,6 +147,7 @@ function App() {
 
  const [authMode, setAuthMode] = useState("login");
  const [userName, setUserName] = useState("");
+ const [dashboardOpen, setDashboardOpen] = useState(false);
   const [formData, setFormData] = useState({
     area: "",
     locality: "Andheri",
@@ -155,6 +168,7 @@ useEffect(() => {
 
     if (data.session) {
       setAuthMode("app");
+      setUser(data.session.user);
 
       const fullName =
         data.session.user.user_metadata?.full_name ||
@@ -180,6 +194,67 @@ const handleLogout = async () => {
   setUserName("");
   setAuthMode("login");
 };
+const handleDashboardOption = (section) => {
+  setDashboardOpen(false);
+
+  // Dashboard
+  if (section === "dashboard") {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+    return;
+  }
+
+  // AI Assistant
+  if (section === "ai-assistant") {
+    setAssistantOpen(true);
+
+    setTimeout(() => {
+      document.getElementById("ai-assistant")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 150);
+
+    return;
+  }
+
+  // Reports
+  if (section === "reports") {
+    if (!price) {
+  alert("Please predict the property price first.");
+  return;
+}
+
+    setTimeout(() => {
+      document.getElementById("reports")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 100);
+
+    return;
+  }
+
+  // Baaki sections
+  const element = document.getElementById(section);
+
+  if (element) {
+    element.classList.remove("dashboard-section-animate");
+
+    void element.offsetWidth;
+
+    element.classList.add("dashboard-section-animate");
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+};
+
+ 
   const [price, setPrice] = useState(null);
   const [priceRange, setPriceRange] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -235,6 +310,30 @@ useEffect(() => {
 
   fetchHeatmapData();
 }, []);
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      dashboardOpen &&
+      !event.target.closest(".floating-dashboard")
+    ) {
+      setDashboardOpen(false);
+    }
+  };
+
+  const handleEscape = (event) => {
+    if (event.key === "Escape") {
+      setDashboardOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  document.addEventListener("keydown", handleEscape);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+    document.removeEventListener("keydown", handleEscape);
+  };
+}, [dashboardOpen]);
 
 const filteredHistory = history.filter((item) =>
   `${item.locality} ${item.city}`
@@ -918,9 +1017,196 @@ if (authMode === "login") {
 
   return (
     <div className="container">
-<button className="dark-mode-btn" onClick={toggleDarkMode}>
-  {darkMode ? "☀️" : "🌙"}
+      {/* FLOATING DASHBOARD MENU */}
+
+<div className={`floating-dashboard ${dashboardOpen ? "open" : ""}`}>
+
+  <button
+    className="dashboard-toggle"
+    onClick={() => setDashboardOpen(!dashboardOpen)}
+    aria-label="Open dashboard menu"
+  >
+    <span className="dashboard-toggle-icon">
+      {dashboardOpen ? "✕" : "☰"}
+    </span>
+
+    {!dashboardOpen && (
+      <span className="dashboard-toggle-text">
+        Menu
+      </span>
+    )}
+  </button>
+
+  <div className="dashboard-menu">
+
+    <div className="dashboard-brand">
+      <div className="dashboard-brand-icon">
+        🏠
+      </div>
+
+      <div>
+        <strong>ESTATE AI</strong>
+        <span>Real Estate Intelligence</span>
+      </div>
+    </div>
+
+    <div className="dashboard-divider"></div>
+
+   
+
+    <button
+      className="dashboard-item active"
+      onClick={() => handleDashboardOption("dashboard")}
+    >
+      <span>⌂</span>
+
+      <div>
+        <strong>Dashboard</strong>
+        <small>Overview</small>
+      </div>
+    </button>
+
+    
+
+    <button
+      className="dashboard-item"
+      onClick={() => handleDashboardOption("prediction")}
+    >
+      <span>✦</span>
+
+      <div>
+        <strong>Prediction</strong>
+        <small>Estimate property price</small>
+      </div>
+    </button>
+
+    <button
+      className="dashboard-item"
+      onClick={() => handleDashboardOption("property-map")}
+    >
+      <span>⌖</span>
+
+      <div>
+        <strong>Property Map</strong>
+        <small>Explore Mumbai</small>
+      </div>
+    </button>
+
+
+
+    <button
+      className="dashboard-item"
+      onClick={() => handleDashboardOption("analytics")}
+    >
+      <span>◫</span>
+
+      <div>
+        <strong>Analytics</strong>
+        <small>Market insights</small>
+      </div>
+    </button>
+
+    <button
+      className="dashboard-item"
+      onClick={() => handleDashboardOption("history")}
+    >
+      <span>◷</span>
+
+      <div>
+        <strong>History</strong>
+        <small>Previous predictions</small>
+      </div>
+    </button>
+
+  
+
+    <button
+      className="dashboard-item"
+      onClick={() => handleDashboardOption("ai-assistant")}
+    >
+      <span>✧</span>
+
+      <div>
+        <strong>AI Assistant</strong>
+        <small>Ask Estate AI</small>
+      </div>
+    </button>
+
+    <button
+      className="dashboard-item"
+      onClick={() => handleDashboardOption("reports")}
+    >
+      <span>▣</span>
+
+      <div>
+        <strong>Reports</strong>
+        <small>Download PDF</small>
+      </div>
+    </button>
+
+    <div className="dashboard-bottom">
+<button
+  className="dashboard-item settings-item"
+  onClick={toggleDarkMode}
+>
+  <span>⚙</span>
+
+  <div>
+    <strong>Appearance</strong>
+    <small>
+      {darkMode ? "Dark mode" : "Light mode"}
+    </small>
+  </div>
 </button>
+
+    <div className="dashboard-profile">
+
+  <div className="profile-avatar">
+    {userName
+      ? userName.charAt(0).toUpperCase()
+      : "U"}
+  </div>
+
+  <div className="profile-info">
+    <strong>
+      {userName || "User"}
+    </strong>
+
+    <small>
+      Property Explorer
+    </small>
+  </div>
+
+  <div className="profile-actions">
+
+  {user ? (
+    <button
+      type="button"
+      className="profile-logout-btn"
+      onClick={handleLogout}
+    >
+      Logout
+    </button>
+  ) : (
+    <button
+      type="button"
+      className="profile-login-btn"
+      onClick={() => setAuthMode("login")}
+    >
+      Login
+    </button>
+  )}
+
+</div>
+
+</div>  
+
+    </div>
+
+  </div>
+
+</div>
+
 
      <header className="hero-header">
   <div className="hero-icon">🏠</div>
@@ -934,30 +1220,19 @@ if (authMode === "login") {
 
     <div className="header-line"></div>
   </div>
-<div className="user-actions">
-  <span className="user-name">
-    👤 {userName}
-  </span>
 
-  <button
-    type="button"
-    className="logout-btn"
-    onClick={handleLogout}
-  >
-    Logout
-  </button>
-</div>
 </header>
   
 
-<div className="map-container">
+<div className="map-container" id="property-map">
   <div className="location-search">
 
-  <input
-    type="text"
-    value={locationSearch}
-    onChange={(e) => setLocationSearch(e.target.value)}
-    placeholder="🔍 Search locality in Mumbai"
+ <input
+  className="location-search-input"
+  type="text"
+  value={locationSearch}
+  onChange={(e) => setLocationSearch(e.target.value)}
+  placeholder="🔍 Search locality in Mumbai"
     onKeyDown={(e) => {
       if (e.key === "Enter") {
         searchLocation();
@@ -966,15 +1241,17 @@ if (authMode === "login") {
   />
 
   <button
-    type="button"
-    onClick={searchLocation}
-  >
-    Search
-  </button>
+  type="button"
+  className="location-search-btn"
+  onClick={searchLocation}
+>
+  Search
+</button>
 
 </div>
   <button
   type="button"
+  className="my-location-btn"
   onClick={() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -1073,20 +1350,20 @@ if (authMode === "login") {
 ))}
   </MapContainer>
 </div>
+<button
+  className="dashboard-item"
+  onClick={() => handleDashboardOption("ai-assistant")}
+>
+  <span>✧</span>
 
-{!assistantOpen && (
-  <button
-    type="button"
-    className="ai-assistant-icon"
-    onClick={() => setAssistantOpen(true)}
-    title="AI Property Assistant"
-  >
-    🤖
-  </button>
-)}
+  <div>
+    <strong>AI Assistant</strong>
+    <small>Ask Estate AI</small>
+  </div>
+</button>
 
 {assistantOpen && (
-  <div className="assistant-section">
+  <div className="assistant-section" id="ai-assistant">
 
     <div className="assistant-header">
 
@@ -1235,7 +1512,7 @@ if (authMode === "login") {
   </div>
 )}
 
-      <div className="form">
+      <div className="form" id="prediction">
 
         <label>Area (sqft)</label>
         <input
@@ -1412,13 +1689,15 @@ if (authMode === "login") {
 )}
 {/* PDF Report Button */}
 {price && (
-  <button
-    type="button"
-    className="download-pdf-btn"
-    onClick={generatePDF}
-  >
-    📄 Download PDF Report
-  </button>
+  <div id="reports">
+    <button
+      type="button"
+      className="download-pdf-btn"
+      onClick={generatePDF}
+    >
+      📄 Download PDF Report
+    </button>
+  </div>
 )}
 
 <p className="price-per-sqft"></p>
@@ -1542,7 +1821,7 @@ if (authMode === "login") {
       )}
      
 {history.length > 0 && (
-  <div className="stats-container">
+  <div className="history" id="history">
 
     <div className="stat-card">
       <span>📊</span>
@@ -1598,7 +1877,7 @@ if (authMode === "login") {
 )}
 
 {history.length > 1 && (
-  <div className="chart-section">
+  <div className="chart-section" id="analytics">
 
     <h2>📈 Price Prediction Analytics</h2>
 
@@ -1646,7 +1925,7 @@ if (authMode === "login") {
 )}
 
 {history.length > 0 && (
-  <div className="history">
+ <div className="history" id="history">
 
     <div className="history-header">
       <div className="history-search">

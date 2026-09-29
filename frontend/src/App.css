@@ -65,17 +65,39 @@ h1::first-letter {
    GLOBAL CARD STYLE
    ========================================================= */
 
+/* =====================================================
+   ESTATE AI — PREMIUM CONTENT CARDS
+   ===================================================== */
+
 .map-container,
 .form,
 .result,
 .history,
 .chart-section {
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.92);
+  position: relative;
+
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(59, 130, 246, 0.08),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(124, 92, 255, 0.06),
+      transparent 32%
+    ),
+    rgba(13, 19, 34, 0.88) !important;
+
   box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.06),
-    0 2px 8px rgba(15, 23, 42, 0.03);
-  backdrop-filter: blur(10px);
+    0 24px 70px rgba(0, 0, 0, 0.32),
+    0 8px 25px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
 }
 
 /* =========================================================
@@ -1829,7 +1851,7 @@ h1::first-letter {
   position: fixed;
 
   top: 20px;
-  left: 20px;
+  left: 325px;
 
   width: 360px;
 
@@ -2117,4 +2139,1901 @@ body.dark .logout-btn {
     padding: 6px 9px;
     font-size: 12px;
   }
+}
+.floating-dashboard {
+  position: fixed !important;
+  top: 24px !important;
+  left: 24px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 99999 !important;
+}
+
+.dashboard-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  height: 52px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #111827,
+    #1d4ed8
+  );
+
+  color: white;
+  cursor: pointer;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.dashboard-menu {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+
+  width: 310px;
+
+  transform-origin: top left;
+}
+/* =====================================================
+   PREMIUM FLOATING DASHBOARD
+   ===================================================== */
+
+.floating-dashboard {
+  position: fixed !important;
+  top: 24px !important;
+  left: 24px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 99999 !important;
+}
+
+/* ---------- MENU BUTTON ---------- */
+
+.dashboard-toggle {
+  position: relative;
+  z-index: 100002;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  height: 52px;
+  min-width: 52px;
+  padding: 0 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.96),
+      rgba(37, 99, 235, 0.96)
+    );
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 35px rgba(15, 23, 42, 0.28),
+    0 0 25px rgba(59, 130, 246, 0.18);
+
+  backdrop-filter: blur(18px);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.dashboard-toggle:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.35),
+    0 0 30px rgba(59, 130, 246, 0.28);
+}
+
+.dashboard-toggle:active {
+  transform: scale(0.96);
+}
+
+.dashboard-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 21px;
+}
+
+.dashboard-toggle-text {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+
+/* ---------- DASHBOARD PANEL ---------- */
+
+.dashboard-menu {
+  position: absolute !important;
+
+  top: 0 !important;
+  left: 0 !important;
+
+  width: 320px;
+
+  padding: 82px 14px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15, 23, 42, 0.97),
+      rgba(17, 24, 39, 0.96)
+    );
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.35),
+    0 0 50px rgba(59, 130, 246, 0.10);
+
+  backdrop-filter: blur(25px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform:
+    translateY(-10px)
+    scale(0.96);
+
+  transform-origin: top left;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0.25s ease;
+}
+
+.floating-dashboard.open .dashboard-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+
+/* ---------- BRAND ---------- */
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 4px 10px 18px;
+}
+
+.dashboard-brand-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #7c3aed
+    );
+
+  color: white;
+
+  font-size: 21px;
+
+  box-shadow:
+    0 8px 22px rgba(37, 99, 235, 0.28);
+}
+
+.dashboard-brand strong {
+  display: block;
+
+  color: #f8fafc;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+}
+
+.dashboard-brand span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+
+/* ---------- DIVIDER ---------- */
+
+.dashboard-divider {
+  height: 1px;
+
+  margin: 0 8px 16px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(148, 163, 184, 0.18),
+      transparent
+    );
+}
+
+
+/* ---------- SECTION LABEL ---------- */
+
+.dashboard-label {
+  margin: 16px 10px 7px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+}
+
+
+/* ---------- MENU ITEMS ---------- */
+
+.dashboard-item {
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 11px 11px;
+
+  margin: 3px 0;
+
+  border: 1px solid transparent;
+  border-radius: 14px;
+
+  background: transparent;
+
+  color: #cbd5e1;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.dashboard-item:hover {
+  background: rgba(59, 130, 246, 0.10);
+
+  border-color:
+    rgba(96, 165, 250, 0.12);
+
+  color: #ffffff;
+
+  transform: translateX(3px);
+}
+
+.dashboard-item > span:first-child {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  color: #93c5fd;
+
+  font-size: 18px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.dashboard-item:hover > span:first-child {
+  background:
+    rgba(59, 130, 246, 0.16);
+
+  color: #60a5fa;
+}
+
+.dashboard-item strong {
+  display: block;
+
+  color: inherit;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dashboard-item small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #64748b;
+
+  font-size: 10px;
+}
+
+.dashboard-item:hover small {
+  color: #94a3b8;
+}
+
+
+/* ---------- ACTIVE ITEM ---------- */
+
+.dashboard-item.active {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(37, 99, 235, 0.18),
+      rgba(124, 58, 237, 0.08)
+    );
+
+  border-color:
+    rgba(96, 165, 250, 0.18);
+
+  color: #ffffff;
+}
+
+.dashboard-item.active::before {
+  content: "";
+
+  position: absolute;
+
+  left: -1px;
+  top: 10px;
+  bottom: 10px;
+
+  width: 3px;
+
+  border-radius: 0 4px 4px 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      #38bdf8,
+      #6366f1
+    );
+}
+
+.dashboard-item.active > span:first-child {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(37, 99, 235, 0.35),
+      rgba(124, 58, 237, 0.28)
+    );
+
+  color: #60a5fa;
+}
+
+
+/* ---------- BOTTOM ---------- */
+
+.dashboard-bottom {
+  margin-top: 12px;
+
+  padding-top: 10px;
+
+  border-top:
+    1px solid rgba(148, 163, 184, 0.10);
+}
+
+
+/* ---------- PROFILE ---------- */
+
+.dashboard-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 8px;
+  padding: 10px;
+
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #7c3aed
+    );
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profile-info {
+  min-width: 0;
+}
+
+.profile-info strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #f8fafc;
+
+  font-size: 12px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-info small {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #64748b;
+
+  font-size: 10px;
+}
+
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 600px) {
+
+  .floating-dashboard {
+    top: 14px !important;
+    left: 14px !important;
+  }
+
+  .dashboard-menu {
+    width: min(310px, calc(100vw - 28px));
+
+    border-radius: 20px;
+  }
+
+  .dashboard-toggle {
+    height: 48px;
+    min-width: 48px;
+  }
+
+}
+/* =====================================================
+   DASHBOARD - COMPACT + SCROLL FIX
+   ===================================================== */
+
+.floating-dashboard {
+  max-height: calc(100vh - 30px) !important;
+}
+
+/* Dashboard panel */
+.dashboard-menu {
+  width: 300px !important;
+
+  max-height: calc(100vh - 30px) !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  box-sizing: border-box;
+
+  padding: 70px 12px 12px !important;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 165, 250, 0.35) transparent;
+}
+
+/* Chrome / Edge scrollbar */
+.dashboard-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.dashboard-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-menu::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.35);
+  border-radius: 10px;
+}
+
+.dashboard-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.65);
+}
+
+
+/* Section headings smaller */
+.dashboard-label {
+  margin: 12px 9px 5px !important;
+
+  font-size: 9px !important;
+  letter-spacing: 1.2px !important;
+}
+
+
+/* Menu item smaller */
+.dashboard-item {
+  min-height: 52px !important;
+
+  padding: 7px 9px !important;
+
+  margin: 2px 0 !important;
+
+  gap: 10px !important;
+
+  border-radius: 12px !important;
+}
+
+
+/* Icon box */
+.dashboard-item > span:first-child {
+  width: 34px !important;
+  height: 34px !important;
+
+  border-radius: 9px !important;
+
+  font-size: 16px !important;
+}
+
+
+/* Main title */
+.dashboard-item strong {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+
+/* Small description */
+.dashboard-item small {
+  margin-top: 2px !important;
+
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+
+/* Brand */
+.dashboard-brand {
+  gap: 10px !important;
+
+  padding: 2px 8px 12px !important;
+}
+
+.dashboard-brand-icon {
+  width: 36px !important;
+  height: 36px !important;
+
+  border-radius: 10px !important;
+
+  font-size: 18px !important;
+}
+
+.dashboard-brand strong {
+  font-size: 12px !important;
+}
+
+.dashboard-brand span {
+  font-size: 9px !important;
+}
+
+
+/* Divider */
+.dashboard-divider {
+  margin: 0 7px 10px !important;
+}
+
+
+/* Bottom section */
+.dashboard-bottom {
+  margin-top: 8px !important;
+  padding-top: 7px !important;
+}
+
+
+/* Profile */
+.dashboard-profile {
+  margin-top: 5px !important;
+  padding: 8px !important;
+
+  border-radius: 11px !important;
+}
+
+.profile-avatar {
+  width: 32px !important;
+  height: 32px !important;
+
+  font-size: 12px !important;
+}
+
+.profile-info strong {
+  font-size: 11px !important;
+}
+
+.profile-info small {
+  font-size: 9px !important;
+}
+
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  .floating-dashboard {
+    top: 12px !important;
+    left: 12px !important;
+  }
+
+  .dashboard-menu {
+    width: min(290px, calc(100vw - 24px)) !important;
+
+    max-height: calc(100vh - 24px) !important;
+  }
+
+}
+/* Dashboard section opening animation */
+.dashboard-section-animate {
+  animation: dashboardSectionOpen 0.6s ease-out;
+}
+
+@keyframes dashboardSectionOpen {
+  0% {
+    opacity: 0;
+    transform: translateY(25px) scale(0.98);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* =====================================================
+   ESTATE AI — PREMIUM BACKGROUND
+   ===================================================== */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+body {
+  margin: 0;
+
+  color: #e8eef8;
+
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(59, 130, 246, 0.16),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 25%,
+      rgba(124, 92, 255, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(53, 214, 200, 0.07),
+      transparent 32%
+    ),
+    #070a12;
+
+  background-attachment: fixed;
+}
+/* Subtle intelligence-grid effect */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      rgba(148, 163, 184, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 42px 42px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    black,
+    transparent 90%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black,
+    transparent 90%
+  );
+
+  z-index: 0;
+}
+/* =====================================================
+   ESTATE AI — PREMIUM LOCATION CONTROLS
+   ===================================================== */
+
+.location-search-input {
+  height: 46px !important;
+  padding: 0 16px !important;
+  color: #e8eef8 !important;
+
+  background: rgba(7, 12, 24, 0.82) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.16) !important;
+  border-radius: 12px !important;
+
+  outline: none !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 8px 25px rgba(0, 0, 0, 0.12) !important;
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease !important;
+}
+
+.location-search-input:focus {
+  background: rgba(10, 17, 32, 0.95) !important;
+
+  border-color: rgba(59, 130, 246, 0.55) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.20) !important;
+}
+
+.location-search-input::placeholder {
+  color: #64748b !important;
+}
+
+.location-search-btn {
+  height: 46px !important;
+  padding: 0 22px !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.28) !important;
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #4f46e5
+  ) !important;
+
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.20) !important;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease !important;
+}
+
+.location-search-btn:hover {
+  transform: translateY(-2px);
+
+  filter: brightness(1.08);
+
+  box-shadow:
+    0 14px 32px rgba(59, 130, 246, 0.28) !important;
+}
+
+.location-search-btn:active {
+  transform: translateY(0);
+}
+
+.my-location-btn {
+  height: 44px !important;
+  padding: 0 18px !important;
+
+  margin-top: 12px !important;
+
+  color: #93c5fd !important;
+
+  background: rgba(37, 99, 235, 0.07) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+
+  border-radius: 11px !important;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+
+.my-location-btn:hover {
+  background: rgba(37, 99, 235, 0.13) !important;
+
+  border-color: rgba(96, 165, 250, 0.35) !important;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 22px rgba(37, 99, 235, 0.10) !important;
+}
+
+.heatmap-btn {
+  margin-top: 10px !important;
+
+  min-height: 44px !important;
+
+  padding: 0 18px !important;
+
+  color: #67e8f9 !important;
+
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.09),
+    rgba(124, 92, 255, 0.08)
+  ) !important;
+
+  border: 1px solid rgba(34, 211, 238, 0.18) !important;
+
+  border-radius: 11px !important;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+
+.heatmap-btn:hover {
+  transform: translateY(-1px);
+
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.15),
+    rgba(124, 92, 255, 0.13)
+  ) !important;
+
+  border-color: rgba(34, 211, 238, 0.35) !important;
+
+  box-shadow:
+    0 8px 24px rgba(34, 211, 238, 0.10) !important;
+}
+/* =====================================================
+   ESTATE AI — PREMIUM PREDICTION CARD
+   ===================================================== */
+
+.form {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 22px !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(59, 130, 246, 0.10),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(124, 92, 255, 0.08),
+      transparent 35%
+    ),
+    rgba(13, 19, 34, 0.92) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.16) !important;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease !important;
+}
+
+/* Soft glow inside card */
+.form::before {
+  content: "";
+  position: absolute;
+
+  top: -120px;
+  right: -120px;
+
+  width: 260px;
+  height: 260px;
+
+  background: rgba(59, 130, 246, 0.08);
+
+  filter: blur(70px);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* Form labels */
+.form label {
+  color: #cbd5e1 !important;
+
+  font-weight: 600 !important;
+
+  letter-spacing: 0.2px;
+}
+
+/* Inputs */
+.form input,
+.form select {
+  color: #e8eef8 !important;
+
+  background: rgba(7, 12, 24, 0.78) !important;
+
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+
+  border-radius: 12px !important;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease !important;
+}
+
+/* Input focus */
+.form input:focus,
+.form select:focus {
+  outline: none !important;
+
+  background: rgba(10, 17, 32, 0.95) !important;
+
+  border-color: rgba(59, 130, 246, 0.55) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.08),
+    0 8px 25px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Placeholder */
+.form input::placeholder {
+  color: #64748b !important;
+}
+
+/* Prediction button */
+.form button[type="submit"] {
+  position: relative;
+
+  border: 1px solid rgba(96, 165, 250, 0.25) !important;
+
+  border-radius: 13px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #4f46e5
+    ) !important;
+
+  box-shadow:
+    0 12px 30px rgba(37, 99, 235, 0.22) !important;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease !important;
+}
+
+.form button[type="submit"]:hover {
+  transform: translateY(-2px);
+
+  filter: brightness(1.08);
+
+  box-shadow:
+    0 16px 38px rgba(59, 130, 246, 0.30) !important;
+}
+
+.form button[type="submit"]:active {
+  transform: translateY(0);
+}
+/* =====================================================
+   ESTATE AI — PREMIUM RESULT CARD
+   ===================================================== */
+
+.result {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 22px !important;
+
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(59, 130, 246, 0.12),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(124, 92, 255, 0.09),
+      transparent 32%
+    ),
+    rgba(13, 19, 34, 0.94) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+
+  box-shadow:
+    0 25px 75px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease !important;
+}
+
+/* Premium glow */
+.result::before {
+  content: "";
+
+  position: absolute;
+
+  width: 280px;
+  height: 280px;
+
+  top: -150px;
+  right: -100px;
+
+  background: rgba(59, 130, 246, 0.10);
+
+  filter: blur(80px);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* Result headings */
+.result h2,
+.result h3 {
+  color: #f8fafc !important;
+
+  letter-spacing: -0.2px;
+}
+
+/* Main predicted price */
+.result .price {
+  color: #60a5fa !important;
+
+  font-weight: 800 !important;
+
+  text-shadow:
+    0 0 25px rgba(59, 130, 246, 0.20);
+}
+
+/* Result information blocks */
+.result .property-summary,
+.result .feature-importance,
+.result .price-range,
+.result .location-analysis,
+.result .model-info {
+  border: 1px solid rgba(148, 163, 184, 0.10) !important;
+
+  background: rgba(7, 12, 24, 0.48) !important;
+
+  border-radius: 14px !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+
+  backdrop-filter: blur(10px);
+}
+
+/* Result buttons */
+.result button {
+  border-radius: 11px !important;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease !important;
+}
+
+.result button:hover {
+  transform: translateY(-2px);
+
+  filter: brightness(1.06);
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.20);
+}
+
+/* PDF button */
+.download-pdf-btn {
+  border: 1px solid rgba(96, 165, 250, 0.25) !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #4f46e5
+    ) !important;
+
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.20) !important;
+}
+
+.download-pdf-btn:hover {
+  box-shadow:
+    0 14px 32px rgba(59, 130, 246, 0.28) !important;
+}
+/* =====================================================
+   ESTATE AI — PREMIUM AI ASSISTANT
+   ===================================================== */
+
+.assistant-section {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 22px !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(124, 92, 255, 0.12),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(6, 182, 212, 0.08),
+      transparent 35%
+    ),
+    rgba(13, 19, 34, 0.94) !important;
+
+  border: 1px solid rgba(124, 92, 255, 0.18) !important;
+
+  box-shadow:
+    0 25px 75px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* AI glow */
+.assistant-section::before {
+  content: "";
+
+  position: absolute;
+
+  width: 280px;
+  height: 280px;
+
+  top: -150px;
+  right: -100px;
+
+  background: rgba(124, 92, 255, 0.10);
+
+  filter: blur(80px);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* Assistant heading */
+.assistant-section h2,
+.assistant-section h3 {
+  color: #f8fafc !important;
+}
+
+/* Assistant input */
+.assistant-section input,
+.assistant-section textarea {
+  color: #e8eef8 !important;
+
+  background: rgba(7, 12, 24, 0.78) !important;
+
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+
+  border-radius: 12px !important;
+
+  outline: none !important;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+
+.assistant-section input:focus,
+.assistant-section textarea:focus {
+  border-color: rgba(124, 92, 255, 0.55) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(124, 92, 255, 0.08),
+    0 8px 25px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Assistant buttons */
+.assistant-section button {
+  border-radius: 11px !important;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease !important;
+}
+
+.assistant-section button:hover {
+  transform: translateY(-2px);
+
+  filter: brightness(1.06);
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.20);
+}
+/* =====================================================
+   ESTATE AI — PREMIUM ANALYTICS
+   ===================================================== */
+
+.chart-section {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 22px !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(59, 130, 246, 0.10),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(6, 182, 212, 0.07),
+      transparent 34%
+    ),
+    rgba(13, 19, 34, 0.94) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.16) !important;
+
+  box-shadow:
+    0 25px 75px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease !important;
+}
+
+/* Analytics glow */
+.chart-section::before {
+  content: "";
+
+  position: absolute;
+
+  width: 260px;
+  height: 260px;
+
+  top: -140px;
+  right: -90px;
+
+  background: rgba(59, 130, 246, 0.09);
+
+  filter: blur(75px);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* Chart heading */
+.chart-section h2,
+.chart-section h3 {
+  color: #f8fafc !important;
+}
+
+/* Analytics text */
+.chart-section p,
+.chart-section span {
+  color: #94a3b8;
+}
+
+/* Recharts area */
+.chart-section .recharts-wrapper {
+  margin-top: 10px;
+}
+
+/* Recharts tooltip */
+.chart-section .recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.chart-section .recharts-default-tooltip {
+  background: rgba(7, 12, 24, 0.96) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.20) !important;
+
+  border-radius: 10px !important;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.30) !important;
+
+  backdrop-filter: blur(12px);
+}
+
+/* Chart buttons */
+.chart-section button {
+  border-radius: 10px !important;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease !important;
+}
+
+.chart-section button:hover {
+  transform: translateY(-1px);
+
+  filter: brightness(1.06);
+}
+/* =====================================================
+   ESTATE AI — FINAL UI POLISH
+   STEP 7 → HISTORY
+   STEP 8 → SUMMARY / INFO CARDS
+   STEP 9 → BUTTONS + TYPOGRAPHY
+   STEP 10 → RESPONSIVE
+   ===================================================== */
+
+
+/* =====================================================
+   STEP 7 — PREMIUM HISTORY
+   ===================================================== */
+
+.history {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 22px !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(59, 130, 246, 0.09),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(124, 92, 255, 0.07),
+      transparent 34%
+    ),
+    rgba(13, 19, 34, 0.94) !important;
+
+  border: 1px solid rgba(96, 165, 250, 0.15) !important;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* History glow */
+
+.history::before {
+  content: "";
+
+  position: absolute;
+
+  width: 250px;
+  height: 250px;
+
+  top: -130px;
+  right: -100px;
+
+  background: rgba(59, 130, 246, 0.08);
+
+  filter: blur(75px);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* History headings */
+
+.history h2,
+.history h3 {
+  color: #f8fafc !important;
+}
+
+/* History text */
+
+.history p,
+.history span {
+  color: #94a3b8;
+}
+
+/* History individual items */
+
+.history-item {
+  background: rgba(7, 12, 24, 0.52) !important;
+
+  border: 1px solid rgba(148, 163, 184, 0.10) !important;
+
+  border-radius: 14px !important;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+
+  background: rgba(15, 23, 42, 0.72) !important;
+
+  border-color: rgba(96, 165, 250, 0.22) !important;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.20) !important;
+}
+
+
+/* =====================================================
+   STEP 8 — PREMIUM SMALL INFO / SUMMARY CARDS
+   ===================================================== */
+
+.property-summary,
+.feature-importance,
+.price-range,
+.location-analysis,
+.model-info {
+  position: relative;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.72),
+      rgba(10, 17, 32, 0.60)
+    ) !important;
+
+  border: 1px solid rgba(148, 163, 184, 0.11) !important;
+
+  border-radius: 15px !important;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+
+.property-summary:hover,
+.feature-importance:hover,
+.price-range:hover,
+.location-analysis:hover,
+.model-info:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(96, 165, 250, 0.20) !important;
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.22) !important;
+}
+
+
+/* =====================================================
+   STEP 9 — PREMIUM TYPOGRAPHY
+   ===================================================== */
+
+h1,
+h2,
+h3,
+h4 {
+  color: #f8fafc;
+}
+
+p {
+  color: #94a3b8;
+}
+
+/* Main headings */
+
+h1 {
+  letter-spacing: -0.6px;
+}
+
+h2 {
+  letter-spacing: -0.35px;
+}
+
+h3 {
+  letter-spacing: -0.2px;
+}
+
+/* Strong text */
+
+strong {
+  color: #e8eef8;
+}
+
+/* Buttons — general polish */
+
+button {
+  font-family: inherit;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease,
+    border-color 0.2s ease !important;
+}
+
+/* Avoid affecting dashboard toggle too much */
+
+.form button:hover,
+.result button:hover,
+.assistant-section button:hover,
+.chart-section button:hover,
+.history button:hover {
+  transform: translateY(-2px);
+}
+
+.form button:active,
+.result button:active,
+.assistant-section button:active,
+.chart-section button:active,
+.history button:active {
+  transform: translateY(0);
+}
+
+
+/* =====================================================
+   PREMIUM SCROLLBAR
+   ===================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070a12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.28);
+
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.48);
+}
+
+
+/* =====================================================
+   STEP 10 — MOBILE RESPONSIVE POLISH
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  .form,
+  .result,
+  .history,
+  .chart-section,
+  .assistant-section {
+    border-radius: 18px !important;
+
+    padding: 18px !important;
+  }
+
+  .property-summary,
+  .feature-importance,
+  .price-range,
+  .location-analysis,
+  .model-info {
+    border-radius: 13px !important;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 480px) {
+
+  .form,
+  .result,
+  .history,
+  .chart-section,
+  .assistant-section {
+    border-radius: 16px !important;
+
+    padding: 15px !important;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 17px;
+  }
+
+  .property-summary,
+  .feature-importance,
+  .price-range,
+  .location-analysis,
+  .model-info {
+    padding: 12px !important;
+  }
+
+}
+/* =====================================================
+   ANALYTICS STAT CARDS — TEXT VISIBILITY FIX
+   ===================================================== */
+
+.chart-section .stat-card,
+.chart-section .stats-card,
+.chart-section .stat-item {
+  color: #f8fafc !important;
+  background: rgba(7, 12, 24, 0.72) !important;
+}
+
+.chart-section .stat-card *,
+.chart-section .stats-card *,
+.chart-section .stat-item * {
+  color: #f8fafc !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.chart-section .stat-card h3,
+.chart-section .stats-card h3,
+.chart-section .stat-item h3 {
+  color: #f8fafc !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+}
+
+.chart-section .stat-card p,
+.chart-section .stats-card p,
+.chart-section .stat-item p {
+  color: #cbd5e1 !important;
+}
+
+.chart-section .stat-card strong,
+.chart-section .stats-card strong,
+.chart-section .stat-item strong {
+  color: #60a5fa !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+}
+/* =====================================================
+   LIGHT MODE — ANALYTICS STAT CARDS
+   ===================================================== */
+
+body:not(.dark-mode) .stat-card {
+  color: #0f172a !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+body:not(.dark-mode) .stat-card small {
+  color: #475569 !important;
+}
+
+body:not(.dark-mode) .stat-card h3 {
+  color: #0f172a !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body:not(.dark-mode) .stat-card > span {
+  color: #2563eb !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+/* =====================================================
+   AI ASSISTANT — PROPERTY RESULTS FIX
+   ===================================================== */
+
+.assistant-section {
+  overflow: visible !important;
+}
+
+.assistant-results {
+  width: 100%;
+  margin-top: 20px;
+  color: #e2e8f0 !important;
+}
+
+.assistant-results h3 {
+  color: #f8fafc !important;
+  margin-bottom: 16px;
+}
+.assistant-property-grid {
+  width: 100%;
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  padding: 4px;
+  box-sizing: border-box;
+}
+.assistant-property-card {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  padding: 18px !important;
+
+  background: rgba(7, 12, 24, 0.82) !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 16px !important;
+
+  color: #e2e8f0 !important;
+  box-sizing: border-box;
+}
+
+.assistant-property-card h3,
+.assistant-property-card p,
+.assistant-property-card strong {
+  color: #e2e8f0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.assistant-property-card h3 {
+  margin: 0;
+}
+
+.assistant-property-card strong {
+  color: #60a5fa !important;
+  font-size: 18px;
+}
+
+.assistant-property-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.assistant-property-card p {
+  margin: 8px 0;
+}
+
+.assistant-property-card button {
+  width: 100%;
+  margin-top: 12px;
 }
