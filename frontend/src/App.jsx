@@ -90,6 +90,7 @@ function LocationSelector({ setFormData }) {
   return null;
 }
 
+
 function MapCenter({ latitude, longitude }) {
   const map = useMap();
 
@@ -139,6 +140,7 @@ function HeatmapLayer({ properties, showHeatmap }) {
 function App() {
    const [darkMode, setDarkMode] = useState(false);
    const [user, setUser] = useState(null);
+   const [pageTransition, setPageTransition] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -995,27 +997,61 @@ if (authMode === "signup") {
 
 if (authMode === "login") {
   return (
-<Login
-  onLogin={(loggedInUser) => {
-    const fullName =
-      loggedInUser.user_metadata?.full_name ||
-      loggedInUser.user_metadata?.name ||
-      loggedInUser.email?.split("@")[0] ||
-      "User";
+    <div
+      className={`login-transition-wrapper ${
+        pageTransition ? "login-leaving" : ""
+      }`}
+    >
+      <div className="login-page-content">
+        <Login
+          onLogin={(loggedInUser) => {
+            const fullName =
+              loggedInUser.user_metadata?.full_name ||
+              loggedInUser.user_metadata?.name ||
+              loggedInUser.email?.split("@")[0] ||
+              "User";
 
-    setUserName(fullName);
-    setUser(loggedInUser);
-    setAuthMode("app");
-  }}
-  onSignup={() => {
-    console.log("CHANGING TO SIGNUP");
-    setAuthMode("signup");
-  }}
-/>
+            setUserName(fullName);
+            setUser(loggedInUser);
+
+            setPageTransition(true);
+
+            setTimeout(() => {
+              setAuthMode("app");
+              setPageTransition(false);
+            }, 3000);
+          }}
+          onSignup={() => {
+            setAuthMode("signup");
+          }}
+        />
+      </div>
+
+      {pageTransition && (
+        <div className="login-success-overlay">
+          <div className="login-success-message">
+
+            <div className="login-success-check">
+              ✓
+            </div>
+
+            <h1>
+              LOGIN SUCCESSFUL
+            </h1>
+
+            <p>
+              ACCESS GRANTED
+            </p>
+
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
-  return (
+return (
+  <div className="main-site-transition">
     <div className="container">
       {/* FLOATING DASHBOARD MENU */}
 
@@ -2141,10 +2177,9 @@ if (authMode === "login") {
     </div>
   )}
 
-    </div>
+     </div>
+  </div>
   );
 }
-
-
 
 export default App;
