@@ -4,6 +4,7 @@ import { supabase } from "./supabaseClient";
 function Login({ onLogin, onSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -13,18 +14,13 @@ function Login({ onLogin, onSignup }) {
     setLoading(true);
     setMessage("");
 
-    console.log("LOGIN EMAIL:", email);
-    console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    console.log("LOGIN RESULT:", { data, error });
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (error) {
-      console.error("SUPABASE LOGIN ERROR:", error);
       setMessage(error.message);
     } else {
       setMessage("Login successful!");
@@ -38,151 +34,341 @@ function Login({ onLogin, onSignup }) {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-bg-grid"></div>
+    <div className="luxury-auth-page">
 
-      <div className="auth-wrapper">
+      {/* Background */}
+      <div className="luxury-auth-background"></div>
+      <div className="luxury-auth-overlay"></div>
 
-        {/* LEFT SIDE */}
-        <div className="auth-visual">
+      {/* Main Content */}
+      <div className="luxury-auth-content">
 
-          <div className="auth-status">
-            <span className="status-dot"></span>
-            ESTATE AI / SYSTEM ONLINE
-          </div>
+        {/* ================= LEFT SIDE ================= */}
 
-          <div className="auth-brand">
-            <span>REAL ESTATE</span>
-<h1>ESTATE<span>AI</span></h1>
-<p>REAL ESTATE PRICE PREDICTION WITH MAP VISUALIZATION</p>
-          </div>
+        <section className="luxury-auth-left">
 
-          <div className="property-visual">
+          {/* Brand */}
+          <div className="luxury-brand">
 
-            <div className="visual-label">
-              PROPERTY ANALYSIS
+            <div className="luxury-brand-logo">
+              🏠
             </div>
 
-            <div className="building-scene">
-              <div className="building building-1"></div>
-              <div className="building building-2"></div>
-              <div className="building building-3"></div>
+            <div>
+              <h1>
+                ESTATE <span>AI</span>
+              </h1>
 
-              <div className="scan-line"></div>
-
-              <div className="map-point point-1"></div>
-              <div className="map-point point-2"></div>
-              <div className="map-point point-3"></div>
-            </div>
-
-            <div className="coordinates">
-              <span>19.0760° N</span>
-              <span>72.8777° E</span>
+              <p>
+                Real Estate Price Prediction with
+                <br />
+                Map Visualization
+              </p>
             </div>
 
           </div>
 
-          <div className="auth-features">
-            <span>AI PREDICTION</span>
-            <span>PROPERTY DATA</span>
-            <span>SMART ANALYTICS</span>
-          </div>
+          {/* Hero */}
+          <div className="luxury-hero-text">
 
-        </div>
-
-        {/* RIGHT SIDE */}
-        <div className="auth-box">
-
-          <div className="auth-top">
-            <span>ACCESS PORTAL</span>
-            <span>01 / 02</span>
-          </div>
-
-          <div className="auth-icon">
-            🏠
-          </div>
-
-          <h2>Welcome Back</h2>
-
-          <p className="auth-subtitle">
-            Access your real estate intelligence dashboard.
-          </p>
-
-          <form onSubmit={handleLogin}>
-
-            <div className="auth-field">
-              <label>Email Address</label>
-
-              <input
-                type="email"
-                placeholder="ENTER EMAIL"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="off"
-                required
-              />
+            <div className="luxury-eyebrow">
+              INTELLIGENT REAL ESTATE
             </div>
 
-            <div className="auth-field">
-              <label>Password</label>
+            <h2>
+              Find the right property.
+              <br />
+              Understand its value.
+              <br />
+              <span>Make smarter decisions.</span>
+            </h2>
 
-              <input
-                type="password"
-                placeholder="ENTER PASSWORD"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                required
-              />
+            <p>
+              AI-powered property valuation, location
+              insights and data-driven real estate intelligence.
+            </p>
+
+          </div>
+
+          {/* Features */}
+          <div className="luxury-features">
+
+            <div className="luxury-feature">
+
+              <div className="luxury-feature-icon">
+                ↗
+              </div>
+
+              <div>
+                <strong>AI Prediction</strong>
+                <small>Estimated Price Prediction</small>
+              </div>
+
             </div>
 
-            <button
-              className="auth-main-btn"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? "AUTHENTICATING..." : "ENTER ESTATE AI →"}
-            </button>
+            <div className="luxury-feature">
 
-          </form>
+              <div className="luxury-feature-icon">
+                ⌖
+              </div>
 
-         {message && (
-  <div
-    className={`auth-message ${
-      message.toLowerCase().includes("successful")
-        ? "auth-success"
-        : "auth-error"
-    }`}
-  >
-    <span className="auth-message-icon">
-      {message.toLowerCase().includes("successful") ? "✓" : "!"}
-    </span>
+              <div>
+                <strong>Map Visualization</strong>
+                <small>Explore Locations</small>
+              </div>
 
-    <span>{message}</span>
-  </div>
-)}
+            </div>
 
-          <div className="auth-switch">
+            <div className="luxury-feature">
 
-            <span>NEW TO ESTATE AI?</span>
+              <div className="luxury-feature-icon">
+                ▥
+              </div>
 
-            <button
-              type="button"
-              onClick={onSignup}
-            >
-              CREATE ACCOUNT →
-            </button>
+              <div>
+                <strong>Smart Analytics</strong>
+                <small>Data-Driven Insights</small>
+              </div>
+
+            </div>
 
           </div>
 
-          <div className="auth-security">
-            <span>● SECURE ACCESS</span>
-            <span>SUPABASE AUTH</span>
+        </section>
+
+
+        {/* ================= RIGHT SIDE ================= */}
+
+        <section className="luxury-auth-right">
+
+          <div className="luxury-auth-card">
+
+            {/* Top Accent */}
+            <div className="luxury-card-line"></div>
+
+            <div className="luxury-card-label">
+              SECURE ACCESS
+            </div>
+
+            <h2>
+              Welcome Back
+            </h2>
+
+            <p className="luxury-card-subtitle">
+              Access your real estate intelligence dashboard.
+            </p>
+
+
+            {/* ================= FORM ================= */}
+
+            <form onSubmit={handleLogin}>
+
+              {/* Email */}
+
+              <div className="luxury-field">
+
+                <label>
+                  Email Address
+                </label>
+
+                <div className="luxury-input-wrap">
+
+                  <span>
+                    ✉
+                  </span>
+
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) =>
+                      setEmail(e.target.value)
+                    }
+                    autoComplete="email"
+                    required
+                  />
+
+                </div>
+
+              </div>
+
+
+              {/* Password */}
+
+              <div className="luxury-field">
+
+                <label>
+                  Password
+                </label>
+
+                <div className="luxury-input-wrap">
+
+                  <span>
+                    🔒
+                  </span>
+
+                  <input
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) =>
+                      setPassword(e.target.value)
+                    }
+                    autoComplete="current-password"
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="luxury-password-toggle"
+                    onClick={() =>
+                      setShowPassword(!showPassword)
+                    }
+                  >
+                    {showPassword ? "🙈" : "👁"}
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              {/* Options */}
+
+              <div className="luxury-options">
+
+                <label className="remember-option">
+
+                  <input
+                    type="checkbox"
+                  />
+
+                  <span>
+                    Remember me
+                  </span>
+
+                </label>
+
+
+              <button
+  type="button"
+  className="forgot-password"
+  onClick={async () => {
+    if (!email) {
+      setMessage("Please enter your email address first.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: `${window.location.origin}/reset-password`,
+      }
+    );
+
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage(
+        "Password reset link has been sent to your email."
+      );
+    }
+
+    setLoading(false);
+  }}
+>
+  Forgot password?
+</button>
+
+              </div>
+
+
+              {/* Login Button */}
+
+              <button
+                type="submit"
+                className="luxury-main-button"
+                disabled={loading}
+              >
+
+                {loading
+                  ? "AUTHENTICATING..."
+                  : "ENTER ESTATE AI →"}
+
+              </button>
+
+            </form>
+
+
+            {/* Message */}
+
+            {message && (
+              <p className="luxury-auth-message">
+                {message}
+              </p>
+            )}
+
+
+            {/* Divider */}
+
+            <div className="luxury-divider">
+
+              <span></span>
+
+              <small>
+                OR
+              </small>
+
+              <span></span>
+
+            </div>
+
+
+            {/* Signup */}
+
+            <div className="luxury-account-switch">
+
+              <span>
+                Don't have an account?
+              </span>
+
+              <button
+                type="button"
+                onClick={onSignup}
+              >
+                Create account →
+              </button>
+
+            </div>
+
+
+            {/* Security */}
+
+            <div className="luxury-security">
+
+              <span>
+                ● SECURE
+              </span>
+
+              <span>
+                SUPABASE AUTH
+              </span>
+
+            </div>
+
           </div>
 
-        </div>
+        </section>
 
       </div>
+
     </div>
   );
 }

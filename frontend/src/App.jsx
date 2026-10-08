@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Prediction from "./pages/Prediction";
 import Signup from "./Signup";
 import Login from "./Login";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
@@ -137,7 +140,7 @@ function HeatmapLayer({ properties, showHeatmap }) {
 
   return null;
 }
-function App() {
+function AppContent() {
    const [darkMode, setDarkMode] = useState(false);
    const [user, setUser] = useState(null);
    const [pageTransition, setPageTransition] = useState(false);
@@ -148,6 +151,7 @@ function App() {
   };
 
  const [authMode, setAuthMode] = useState("login");
+ const [sessionLoading, setSessionLoading] = useState(true);
  const [userName, setUserName] = useState("");
  const [dashboardOpen, setDashboardOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -166,19 +170,30 @@ function App() {
   });
 useEffect(() => {
   const checkSession = async () => {
-    const { data } = await supabase.auth.getSession();
+    try {
+      const { data, error } = await supabase.auth.getSession();
 
-    if (data.session) {
-      setAuthMode("app");
-      setUser(data.session.user);
+      if (error) {
+        console.error("Session check error:", error);
+        return;
+      }
 
-      const fullName =
-        data.session.user.user_metadata?.full_name ||
-        data.session.user.user_metadata?.name ||
-        data.session.user.email?.split("@")[0] ||
-        "User";
+      if (data.session) {
+        setAuthMode("app");
+        setUser(data.session.user);
 
-      setUserName(fullName);
+        const fullName =
+          data.session.user.user_metadata?.full_name ||
+          data.session.user.user_metadata?.name ||
+          data.session.user.email?.split("@")[0] ||
+          "User";
+
+        setUserName(fullName);
+      }
+    } catch (error) {
+      console.error("Session check failed:", error);
+    } finally {
+      setSessionLoading(false);
     }
   };
 
@@ -255,8 +270,36 @@ const handleDashboardOption = (section) => {
     });
   }
 };
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get("section");
 
- 
+  if (
+    !["prediction", "property-map", "analytics", "ai-assistant"].includes(section)
+  ) {
+    return;
+  }
+
+  // AI Assistant ko pehle open karo
+  if (section === "ai-assistant") {
+    setAssistantOpen(true);
+  }
+
+  const timer = setTimeout(() => {
+    const element = document.getElementById(section);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
+      window.history.replaceState({}, "", "/");
+    }
+  }, section === "ai-assistant" ? 300 : 200);
+
+  return () => clearTimeout(timer);
+}, [authMode]);
   const [price, setPrice] = useState(null);
   const [priceRange, setPriceRange] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -991,6 +1034,14 @@ longitude: formData.longitude,
 
   setLoading(false);
 };
+if (sessionLoading) {
+  return (
+    <div className="session-loading">
+      <div className="session-spinner"></div>
+      <p>Loading Estate AI...</p>
+    </div>
+  );
+}
 if (authMode === "signup") {
   return <Signup onLogin={() => setAuthMode("login")} />;
 }
@@ -1003,6 +1054,7 @@ if (authMode === "login") {
       }`}
     >
       <div className="login-page-content">
+
         <Login
           onLogin={(loggedInUser) => {
             const fullName =
@@ -1016,19 +1068,20 @@ if (authMode === "login") {
 
             setPageTransition(true);
 
-            setTimeout(() => {
-              setAuthMode("app");
-              setPageTransition(false);
-            }, 3000);
+           setTimeout(() => {
+  window.location.assign("/dashboard");
+}, 1000);
           }}
           onSignup={() => {
             setAuthMode("signup");
           }}
         />
+
       </div>
 
       {pageTransition && (
         <div className="login-success-overlay">
+
           <div className="login-success-message">
 
             <div className="login-success-check">
@@ -1044,8 +1097,10 @@ if (authMode === "login") {
             </p>
 
           </div>
+
         </div>
       )}
+
     </div>
   );
 }
@@ -2179,6 +2234,50 @@ return (
 
      </div>
   </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AppContent />} />
+
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        <Route path="/prediction" element={<Prediction />} />
+
+        <Route
+          path="/property-map"
+          element={
+            <div className="page-placeholder">
+              <h1>Property Map</h1>
+              <p>Property map will be available here.</p>
+            </div>
+          }
+        />
+
+        <Route
+          path="/analytics"
+          element={
+            <div className="page-placeholder">
+              <h1>Analytics</h1>
+              <p>Property analytics will be available here.</p>
+            </div>
+          }
+        />
+
+        <Route
+          path="/ai-assistant"
+          element={
+            <div className="page-placeholder">
+              <h1>AI Assistant</h1>
+              <p>Estate AI Assistant will be available here.</p>
+            </div>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
