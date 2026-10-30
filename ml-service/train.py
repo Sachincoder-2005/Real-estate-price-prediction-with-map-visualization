@@ -296,3 +296,119 @@ joblib.dump(
 print("\nBest model saved successfully!")
 print("Selected model:", best_model_name)
 print("Location: ./models/random_forest_model.pkl")
+
+print("\n========== MODEL RESULTS FOR PROJECT REPORT ==========")
+print(f"{'Model':<22} {'RMSE (₹ lakh)':>15} {'MAE (₹ lakh)':>15} {'R² Score':>12}")
+print("-" * 68)
+
+for model_name, metrics in results.items():
+    print(
+        f"{model_name:<22} "
+        f"{metrics['RMSE'] / 100000:>15.2f} "
+        f"{metrics['MAE'] / 100000:>15.2f} "
+        f"{metrics['R2']:>12.4f}"
+    )
+
+print("\nBest Performing Model:", best_model_name)
+print(f"R² Percentage: {results[best_model_name]['R2'] * 100:.2f}%")
+# 26. Random Forest Feature Importance Graph
+
+import matplotlib.pyplot as plt
+
+# Get the trained Random Forest model
+rf = random_forest_model.named_steps["model"]
+
+# Get feature names after preprocessing
+feature_names = random_forest_model.named_steps[
+    "preprocessor"
+].get_feature_names_out()
+
+# Get importance values
+importances = rf.feature_importances_
+
+# Combine encoded categories into original feature groups
+importance_df = pd.DataFrame({
+    "Feature": feature_names,
+    "Importance": importances
+})
+
+importance_df["Feature"] = (
+    importance_df["Feature"]
+    .str.replace("categorical__", "", regex=False)
+    .str.replace("numerical__", "", regex=False)
+)
+
+importance_df["Feature"] = importance_df["Feature"].apply(
+    lambda f: (
+        "Locality"
+        if f.startswith("locality_")
+        else "City"
+        if f.startswith("city_")
+        else "Property Type"
+        if f.startswith("property_type_")
+        else "Furnishing Status"
+        if f.startswith("furnished_")
+        else f
+    )
+)
+
+importance_df = (
+    importance_df.groupby("Feature", as_index=False)["Importance"]
+    .sum()
+    .sort_values("Importance", ascending=False)
+    .head(8)
+    .sort_values("Importance")
+)
+
+# Draw graph
+plt.figure(figsize=(10, 6))
+bars = plt.barh(
+    importance_df["Feature"],
+    importance_df["Importance"]
+)
+
+plt.bar_label(bars, fmt="%.3f", padding=4)
+plt.xlabel("Relative Feature Importance")
+plt.title("Feature Importance – Selected Model (Random Forest)")
+plt.tight_layout()
+
+plt.savefig(
+    "random_forest_feature_importance.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.show()
+
+print("Random Forest feature importance graph saved!")
+
+import matplotlib.pyplot as plt
+
+rf = random_forest_model.named_steps["model"]
+feature_names = random_forest_model.named_steps["preprocessor"].get_feature_names_out()
+
+importance_df = pd.DataFrame({
+    "Feature": feature_names,
+    "Importance": rf.feature_importances_
+})
+
+importance_df["Feature"] = (
+    importance_df["Feature"]
+    .str.replace("numerical__", "", regex=False)
+    .str.replace("categorical__", "", regex=False)
+)
+
+importance_df = importance_df.nlargest(8, "Importance")
+importance_df = importance_df.sort_values("Importance")
+
+plt.figure(figsize=(10, 6))
+plt.barh(importance_df["Feature"], importance_df["Importance"], color="seagreen")
+
+for i, value in enumerate(importance_df["Importance"]):
+    plt.text(value + 0.002, i, f"{value:.3f}", va="center")
+
+plt.xlabel("Relative Feature Importance")
+plt.title("Figure 14: Feature Importance - Random Forest")
+plt.tight_layout()
+plt.savefig("random_forest_feature_importance.png", dpi=300)
+plt.show()

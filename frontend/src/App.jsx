@@ -456,15 +456,18 @@ const searchLocation = async () => {
     console.error("Location search error:", error);
     alert("Location search nahi ho paayi.");
   }
-};
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+};const handleChange = (e) => {
+  const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  if (Number(value) < 0) {
+    return;
+  }
+
+  setFormData({
+    ...formData,
+    [name]: value,
+  });
+};
 
   const generatePDF = () => {
   if (!price) {
@@ -1602,6 +1605,7 @@ return (
 
   </div>
 )}
+
 
       <div className="form" id="prediction">
 
